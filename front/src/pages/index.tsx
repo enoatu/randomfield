@@ -1,7 +1,7 @@
 import Layout from '@c/Layout'
 import { useTranslation } from 'react-i18next'
 
-export default function Home() {
+export default function Main() {
   const { t } = useTranslation()
   return (
     <Layout title="Top">
@@ -12,71 +12,6 @@ export default function Home() {
           <a href="./count-text" className="card">
             <h3>Count Text &rarr;</h3>
             <p>Count Text</p>
-          </a>
-          <a href="./create-loop-text" className="card">
-            <h3>Create Loop &rarr;</h3>
-            <p>Create Loop Text</p>
-          </a>
-          <a href="./create-image" className="card">
-            <h3>{t('title', { ns: 'create-image' })} &rarr;</h3>
-            <p>{t('description', { ns: 'create-image'})}</p>
-          </a>
-          <a href="./pretty-json" className="card">
-            <h3>Pretty Json &rarr;</h3>
-            <p>Smart Pretty Json</p>
-          </a>
-          <a href="./delete-spaces-only-line" className="card">
-            <h3>Delete Spaces Only Line &rarr;</h3>
-            <p>Simple Spaces Only Line Remove For Efficient</p>
-          </a>
-          <a href="./delete-line-breaks" className="card">
-            <h3>Delete Line Breaks &rarr;</h3>
-            <p>Simple Line Breaks Remove For Efficient</p>
-          </a>
-          <a href="./keep-ratio" className="card">
-            <h3>KeepRatioResize &rarr;</h3>
-            <p>Simple Text Replacer For Efficient</p>
-          </a>
-          <a href="./replacer" className="card">
-            <h3>Replacer &rarr;</h3>
-            <p>Simple Text Replacer For Efficient</p>
-          </a>
-          <a href="./combination" className="card">
-            <h3>Combination &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a href="./multi-replacer" className="card">
-            <h3>MultiReplacer &rarr;</h3>
-            <p>MultiReplacer</p>
-          </a>
-          <a href="./highlight-string" className="card">
-            <h3>Highlight String &rarr;</h3>
-            <p>Instantly Highlight String by number</p>
-          </a>
-          <a href="./create-num-string" className="card">
-            <h3>CreateNumString &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-          <a href="./merge-text" className="card">
-            <h3>MergeText &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-          <a href="./merge-text-for-sql" className="card">
-            <h3>MergeText For SQL &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-          <a href="./utf16-decoder" className="card">
-            <h3>utf16 decoder &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
           </a>
         </div>
       </main>
