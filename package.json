@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "next dev -p ${PORT:=41210}",
+    "dev": "next dev -p ${PORT:=40210}",
     "build": "next build",
-    "start": "next start -p ${PORT:=41210}",
+    "start": "next start -p ${PORT:=40210}",
     "export": "next export",
     "type-check": "tsc",
     "fmt": "prettier --check --write 'src/**/*{.js,.jsx,.ts,.tsx}'",
