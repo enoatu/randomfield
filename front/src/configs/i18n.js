@@ -4,22 +4,14 @@ import { initReactI18next } from 'react-i18next'
 const resources = {
   en: {
     'common': {
-      'title': 'DevUtils',
-      'description': 'Support Tools for Developers.',
-    },
-    'create-image': {
-      'title': 'Image Creation Tools',
-      'description': 'Create an image by specifying height, width, etc.',
+      'title': 'RandomField',
+      'description': 'This is The RandomField.',
     },
   },
   ja: {
     'common': {
-      'title': '開発ツール',
-      'description': '開発者向けサポートツール',
-    },
-    'create-image': {
-      'title': '画像作成ツール',
-      'description': '高さや横幅などを指定して、画像を作成します',
+      'title': 'ランダムフィールド',
+      'description': 'これがランダムフィールドだ',
     },
   },
 }

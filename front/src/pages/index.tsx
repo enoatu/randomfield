@@ -1,14 +1,37 @@
+import { useState } from 'react'
 import Layout from '@c/Layout'
+import configs from '@/configs'
 import { useTranslation } from 'react-i18next'
 
 export default function Main() {
-  const { t } = useTranslation()
+  if (typeof window === 'undefined') {
+    return null
+  }
+  const { t, i18n } = useTranslation('main')
+  i18n.addResourceBundle('ja', 'main', {
+    'go': '確定',
+  })
+  const [input, setInput] = useState('')
+  const [output, setOutput] = useState('')
+  const isHttps = location.protocol === 'https:'
+  const uri = (isHttps ? 'wss' : 'ws')
+    + `://${location.hostname}:${configs.serverPort}${location.pathname}ws`;
+  console.log(uri)
+
+  const ws = new WebSocket(uri)
+  ws.onopen = () => console.log('Connected')
+  ws.onmessage = evt => setOutput(evt.data)
+  const onClick = () => ws.send(input)
+
   return (
     <Layout title="Top">
       <main>
         <h1 className="title">{t('title', { ns: 'common' })}</h1>
         <p className="description">{t('description', { ns: 'common' })}</p>
         <div className="grid">
+          <p>{output}</p>
+          <input type="text" onChange={e => setInput(e.target.value)} value={input}/>
+          <button onClick={() => onClick()}>{t('go')}</button>
           <a href="./count-text" className="card">
             <h3>Count Text &rarr;</h3>
             <p>Count Text</p>

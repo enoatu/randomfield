@@ -1,0 +1,56 @@
+version: '3.7'
+services:
+  app:
+    build:
+      context: ./app
+      target: dev
+    volumes:
+      - ./app/randomfield/:/go/src/randomfield
+    ports:
+      - 29080:8080
+
+        #env_file:
+        # # require for env reading
+        # - ./app/randomfield/.env
+       #  depends_on:
+       #    - mysql
+        #mysql:
+        #  image: mysql:8.0.27
+        #  environment:
+        #    TZ: Asia/Tokyo # my.cnf参照
+        #    MYSQL_ROOT_PASSWORD: root
+        #    MYSQL_DATABASE: app
+        #    MYSQL_USER: app
+        #    MYSQL_PASSWORD: app
+        #  ports:
+        #    - 29306:3306
+        #  volumes:
+        #    - mysql-data:/var/lib/mysql
+        #    - ./etc/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+        #    - ./etc/mysql/ddl/:/docker-entrypoint-initdb.d/
+        #mysqldef:
+        #  build:
+        #    context: etc/mysqldef
+        #  command: '-uroot -proot -hmysql --file=/create_table randomfield'
+        #  volumes:
+        #    - ./etc/mysql/ddl/2_create_table.sql:/create_table
+        #  depends_on:
+        #    - mysql
+        #phpmyadmin:
+        #  image: phpmyadmin/phpmyadmin
+        #  environment:
+        #    - PMA_ARBITRARY=1
+        #    - PMA_HOSTS=mysql
+        #    - PMA_USER=root
+        #    - PMA_PASSWORD=root # =MYSQL_ROOT_PASSWORD
+        #  ports:
+        #    - 29180:80
+  redis:
+    image: redis:5.0.6
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --requirepass 7sdfaZ7asfgaq
+    ports:
+      - 29790:6379
+volumes:
+  redis-data:
