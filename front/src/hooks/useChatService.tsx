@@ -18,7 +18,7 @@ const useChatService = (initialMessage: string): ChatService => {
     socketRef.current = ws
     socketRef.current.onopen = () => console.log('Connected')
     socketRef.current.onmessage = (evt) => {
-      setMessages([...messages, evt.data])
+      setMessages((prevMessages) => [...prevMessages, evt.data])
     }
     return () => {
       if (!socketRef.current) throw new Error()

@@ -17,16 +17,18 @@ export default function Main () {
       <main>
         <h1 className="title">{t('title', { ns: 'common' })}</h1>
         <p className="description">{t('description', { ns: 'common' })}</p>
+        {messages.map((message, index) => (
+          <p style={{ margin: 0 }} key={index}>
+            {message}
+          </p>
+        ))}
+        <input
+          type="text"
+          onChange={(e) => setInput(e.target.value)}
+          value={input}
+        />
+        <button onClick={click}>{t('go')}</button>
         <div className="grid">
-          {messages.map((message, index) => (
-            <p key={index}>{message}</p>
-          ))}
-          <input
-            type="text"
-            onChange={(e) => setInput(e.target.value)}
-            value={input}
-          />
-          <button onClick={click}>{t('go')}</button>
           <a href="./count-text" className="card">
             <h3>Count Text &rarr;</h3>
             <p>Count Text</p>
