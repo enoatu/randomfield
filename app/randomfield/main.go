@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/net/websocket"
+	"randomfield/models"
 )
 
 func handleWebSocket(c echo.Context) error {
@@ -12,7 +13,7 @@ func handleWebSocket(c echo.Context) error {
 		defer ws.Close()
 
 		// 初回のメッセージを送信
-        //err := websocket.Message.Send(ws, "Server: Hello, Client!")
+		//err := websocket.Message.Send(ws, "Server: Hello, Client!")
 		//if err != nil {
 		//	c.Logger().Error(err)
 		//}
@@ -20,7 +21,7 @@ func handleWebSocket(c echo.Context) error {
 		for {
 			// Client からのメッセージを読み込む
 			msg := ""
-            err := websocket.Message.Receive(ws, &msg)
+			err := websocket.Message.Receive(ws, &msg)
 			if err != nil {
 				c.Logger().Error(err)
 			}
@@ -39,6 +40,10 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Static("/", "public")
-	e.GET("/ws", handleWebSocket)
+	r := models.NewRoom()
+	// チャットルームを開始します
+	go r.Run()
+	e.GET("/ws", r.Handle)
+	//e.GET("/room", handleWebSocket)
 	e.Logger.Fatal(e.Start(":8080"))
 }
