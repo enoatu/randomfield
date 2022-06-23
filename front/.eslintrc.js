@@ -1,24 +1,18 @@
 module.exports = {
   env: {
     browser: true,
-    es2021: true
+    es2021: true,
   },
-  extends: [
-    'plugin:react/recommended',
-    'standard',
-  ],
+  extends: ['plugin:react/recommended', 'standard'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
-      jsx: true
+      jsx: true,
     },
     ecmaVersion: 12,
-    sourceType: 'module'
+    sourceType: 'module',
   },
-  plugins: [
-    'react',
-    '@typescript-eslint'
-  ],
+  plugins: ['react', '@typescript-eslint'],
   rules: {
     semi: 'error',
     // let と const の区別を厳格化
@@ -33,7 +27,7 @@ module.exports = {
   settings: {
     react: {
       // Warning: React version not specified in eslint-plugin-react settings. が出ないように
-      version: 'detect'
-    }
-  }
+      version: 'detect',
+    },
+  },
 }
