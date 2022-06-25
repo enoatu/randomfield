@@ -1,138 +1,47 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Layout from '@c/Layout'
 import { useTranslation } from 'react-i18next'
-import useChatService from '@/hooks/useChatService'
+import { useRouter } from 'next/router'
 
-export default function Main () {
-  const { t, i18n } = useTranslation('main')
-  i18n.addResourceBundle('ja', 'main', {
-    go: '確定'
+export default function Top () {
+  const router = useRouter()
+  const { t, i18n } = useTranslation('top')
+  i18n.addResourceBundle('ja', 'portalInputName', {
+    'Please Input Your Name!': '名前を入力してください',
+    'Go!': '確定'
   })
-  const [input, setInput] = useState('')
-  const [messages, sendMessage] = useChatService('初期')
-  const click = () => sendMessage(input)
 
+  useEffect(() => {
+    localStorage.clear()
+  }, [])
+
+  const [name, setName] = useState('')
+  const click = () => {
+    if (name === '') return
+    localStorage.setItem('name', name)
+    router.replace('/room')
+  }
   return (
     <Layout title="Top">
       <main>
         <h1 className="title">{t('title', { ns: 'common' })}</h1>
         <p className="description">{t('description', { ns: 'common' })}</p>
-        {messages.map((message, index) => (
-          <p style={{ margin: 0 }} key={index}>
-            {message}
-          </p>
-        ))}
-        <input
-          type="text"
-          onChange={(e) => setInput(e.target.value)}
-          value={input}
-        />
-        <button onClick={click}>{t('go')}</button>
-        <div className="grid">
-          <a href="./count-text" className="card">
-            <h3>Count Text &rarr;</h3>
-            <p>Count Text</p>
-          </a>
+        <div className="wrapper">
+          <p>{t('Please Input Your Name!')}</p>
+          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <button onClick={click}>{t('Go!')}</button>
         </div>
-      </main>
-      <style jsx>{`
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
-
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
-
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 4rem;
-        }
-
-        .title,
-        .description {
-          text-align: center;
-        }
-
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
-
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-
-        .grid {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          max-width: 800px;
-          margin-top: 3rem;
-        }
-
-        .card {
-          margin: 1rem;
-          flex-basis: 45%;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
-
-        .card:hover,
-        .card:focus,
-        .card:active {
-          color: #0070f3;
-          border-color: #0070f3;
-        }
-
-        .card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
-        }
-
-        .card p {
-          margin: 0;
-          font-size: 1.25rem;
-          line-height: 1.5;
-        }
-
-        @media (max-width: 600px) {
-          .grid {
-            width: 100%;
+        <style jsx>{`
+          wrapper {
+            padding: 5rem 0;
+            flex: 1;
+            display: flex;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
           }
-        }
-      `}</style>
+        `}</style>
+      </main>
     </Layout>
   )
 }

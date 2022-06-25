@@ -1,38 +1,31 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import configs from '@/configs'
+import { Message } from '@/models/Chat'
 
-type ChatService = [string[], (text: string) => void]
-
-const useChatService = (initialMessage: string): ChatService => {
-  const [messages, setMessages] = useState([initialMessage])
-
+const useChatService = (initMessage: Message) => {
+  const [messages, setMessages] = useState<Message[]>([initMessage])
   const socketRef = useRef<WebSocket | null>(null)
-
-  useEffect(() => {
+  const connect = (query: string) => {
     const isHttps = location.protocol === 'https:'
+
     const url =
       (isHttps ? 'wss' : 'ws') +
-      `://${location.hostname}:${configs.serverPort}${location.pathname}ws`
+      `://${location.hostname}:${configs.serverPort}/ws?${query}`
     console.log('Connecting..')
     const ws = new WebSocket(url)
     socketRef.current = ws
     socketRef.current.onopen = () => console.log('Connected')
     socketRef.current.onmessage = (evt) => {
-      setMessages((prevMessages) => [...prevMessages, evt.data])
+      setMessages((prevMessages) => [...prevMessages, JSON.parse(evt.data)])
     }
-    return () => {
-      if (!socketRef.current) throw new Error()
-      console.log('Disconnecting..')
-      socketRef.current.close()
-    }
-  }, [])
-
-  const sendMessage = (text: string): void => {
-    if (!socketRef.current) throw new Error()
-    socketRef.current.send(text)
   }
 
-  return [messages, sendMessage]
+  const sendMessage = (message: Message): void => {
+    if (!socketRef.current) throw new Error()
+    socketRef.current.send(JSON.stringify(message))
+  }
+
+  return { messages, sendMessage, connect }
 }
 
 export default useChatService
