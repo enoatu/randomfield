@@ -25,7 +25,7 @@ const useChatService = (initMessage: Message) => {
     socketRef.current.send(JSON.stringify(message))
   }
 
-  return { messages, sendMessage, connect }
+  return { messages, sendMessage, connect, socketRef }
 }
 
 export default useChatService

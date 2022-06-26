@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 import Layout from '@c/Layout'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'next/router'
+import { strictEnter } from '@/utils/event'
 
 export default function Top () {
   const router = useRouter()
   const { t, i18n } = useTranslation('top')
-  i18n.addResourceBundle('ja', 'portalInputName', {
+  i18n.addResourceBundle('ja', 'top', {
     'Please Input Your Name!': '名前を入力してください',
     'Go!': '確定'
   })
@@ -28,7 +29,11 @@ export default function Top () {
         <p className="description">{t('description', { ns: 'common' })}</p>
         <div className="wrapper">
           <p>{t('Please Input Your Name!')}</p>
-          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => strictEnter(e, click)}
+          />
           <button onClick={click}>{t('Go!')}</button>
         </div>
         <style jsx>{`

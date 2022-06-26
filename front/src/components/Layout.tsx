@@ -8,10 +8,7 @@ type Props = {
   title: string
 }
 
-export default function Layout({
-  children,
-  title = 'This is the default title',
-}: Props) {
+export default function Layout ({ children, title }: Props) {
   const gaId = process.env.NEXT_PUBLIC_GA_ID
   const gaURL = `https://www.googletagmanager.com/gtag/js?id=${gaId}`
   const dangerouslyHTML = {
@@ -21,12 +18,13 @@ export default function Layout({
     gtag('js', new Date())
     gtag('config', '${gaId}', {
       page_path: window.location.pathname,
-    })`,
+    })`
   }
   const { i18n } = useTranslation()
   const toggleLocale = async () => {
     await i18n.changeLanguage(i18n.language === 'en' ? 'ja' : 'en')
-    typeof window === 'undefined' || sessionStorage.setItem('lang', i18n.language)
+    typeof window === 'undefined' ||
+      sessionStorage.setItem('lang', i18n.language)
   }
   return (
     <div className="container">
