@@ -2,6 +2,7 @@ package models
 
 import (
 	"bytes"
+	"encoding/json"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/websocket"
 	"randomfield/services"
@@ -17,7 +18,6 @@ type room struct {
 	// clientsには在室しているすべてのクライアントが保持されます。
 	clients map[*client]bool
 	// tracerはチャットルーム上で行われた操作のログを受け取ります。
-
 	tracer services.Tracer
 }
 
@@ -33,13 +33,18 @@ func NewRoom() *room {
 	}
 }
 
+type Message struct {
+	Name string `json:"name"`
+	Body string `json:"body"`
+}
+
 func (r *room) Run() {
 	for {
 		select {
 		case client := <-r.join:
 			// 参加
 			r.clients[client] = true
-			r.tracer.Trace("新しいクライアントが参加しました")
+			r.tracer.Trace("新しい1クライアントが参加しました")
 		case client := <-r.leave:
 			// 退室
 			delete(r.clients, client)
@@ -81,6 +86,10 @@ func (r *room) Handle(c echo.Context) error {
 		}
 
 		r.join <- client
+
+		message := Message{Name: client.user.name, Body: "参加したよ！よろしくね！"}
+		s, _ := json.Marshal(message)
+		r.forward <- []byte(string(s))
 		defer func() { r.leave <- client }()
 		go client.write()
 		client.read()

@@ -1,10 +1,8 @@
 package models
 
 import (
-	"bytes"
 	"fmt"
 	"golang.org/x/net/websocket"
-	"randomfield/services"
 )
 
 // clientはチャットを行っている1人のユーザーを表します。
@@ -32,10 +30,7 @@ func (c *client) read() {
 
 func (c *client) write() {
 	for msg := range c.send {
-		err := websocket.Message.Send(c.socket, fmt.Sprintf("%s", msg))
-
-		var buffer bytes.Buffer
-		services.NewTracer(&buffer).Trace(msg)
+		err := websocket.Message.Send(c.socket, fmt.Sprintf("%s", string(msg)))
 		if err != nil {
 			break
 		}
