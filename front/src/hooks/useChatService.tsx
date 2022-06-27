@@ -26,10 +26,9 @@ const useChatService = () => {
       setMessages((prevMessages) => [...prevMessages, JSON.parse(evt.data)])
     }
     const connectInterval = window.setInterval(() => {
-      if (!isConnectOpen()) {
-        clearInterval(connectInterval)
-        handleError()
-      }
+      if (isConnectOpen()) return
+      clearInterval(connectInterval)
+      handleError()
     }, 500)
     return () => {
       clearInterval(connectInterval)
