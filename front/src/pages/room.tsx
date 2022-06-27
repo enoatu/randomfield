@@ -20,19 +20,15 @@ export default function Room () {
     return null
   }
 
-  const { messages, sendMessage, connect, socketRef } = useChatService({
-    name,
-    body: '入室しました'
-  })
+  const { messages, sendMessage, connect } = useChatService()
 
   useEffect(() => {
     const query = { name }
     const params = new URLSearchParams(query).toString()
-    connect(params)
-    if (!socketRef.current) throw new Error()
-    socketRef.current.onerror = () => {
+    const unmount = connect(params, () => {
       router.replace('/')
-    }
+    })
+    return unmount
   }, [])
 
   const [input, setInput] = useState('')
@@ -40,7 +36,6 @@ export default function Room () {
     sendMessage({ name, body: input })
     setInput('')
   }
-  const exit = () => router.replace('/')
   return (
     <Layout title="Top">
       <main>
@@ -61,7 +56,7 @@ export default function Room () {
           value={input}
         />
         <button onClick={send}>{t('go')}</button>
-        <button onClick={exit}>{t('exit')}</button>
+        <button onClick={() => router.replace('/')}>{t('exit')}</button>
       </main>
     </Layout>
   )

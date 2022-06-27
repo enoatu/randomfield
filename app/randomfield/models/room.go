@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/websocket"
-	"log"
 	"randomfield/services"
 )
 
@@ -24,7 +23,6 @@ type room struct {
 
 // newRoomはすぐに利用できるチャットルームを生成して返します。
 func NewRoom() *room {
-	log.Print("sssssss")
 	var buffer bytes.Buffer
 	return &room{
 		forward: make(chan []byte),
@@ -55,7 +53,6 @@ func (r *room) Run() {
 				case client.send <- msg:
 					// メッセージを送信
 					r.tracer.Trace(" -- クライアントに送信されました")
-					log.Print("sssssss11111")
 				default:
 					// 送信に失敗
 					delete(r.clients, client)
