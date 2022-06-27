@@ -5,7 +5,7 @@ import { Message } from '@/models/Chat'
 const useChatService = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const socketRef = useRef<WebSocket | null>(null)
-  const [handleError, setHandleError] = useState<() => void>(() => {}) //eslint-disable-line
+  const [handleError, setHandleError] = useState<() => void>(() => {}) // eslint-disable-line
 
   const isConnectOpen = () => {
     if (!socketRef.current) throw new Error()
