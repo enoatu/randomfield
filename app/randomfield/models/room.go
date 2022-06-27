@@ -90,6 +90,7 @@ func (r *room) Handle(c echo.Context) error {
 		message := Message{Name: client.user.name, Body: "参加したよ！よろしくね！"}
 		s, _ := json.Marshal(message)
 		r.forward <- []byte(string(s))
+
 		defer func() { r.leave <- client }()
 		go client.write()
 		client.read()
