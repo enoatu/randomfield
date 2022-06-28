@@ -9,6 +9,8 @@ import (
 )
 
 type room struct {
+	gameInfo *GameInfo
+	message  *Message
 	// forwardは他のクライアントに転送するためのメッセージを保持するチャネルです。
 	forward chan []byte
 	// joinはチャットルームに参加しようとしているクライアントのためのチャネルです。
@@ -25,17 +27,63 @@ type room struct {
 func NewRoom() *room {
 	var buffer bytes.Buffer
 	return &room{
-		forward: make(chan []byte),
-		join:    make(chan *client),
-		leave:   make(chan *client),
-		clients: make(map[*client]bool),
-		tracer:  services.NewTracer(&buffer),
+		gameInfo: &GameInfo{TurnCount: 1},
+		forward:  make(chan []byte),
+		join:     make(chan *client),
+		leave:    make(chan *client),
+		clients:  make(map[*client]bool),
+		tracer:   services.NewTracer(&buffer),
 	}
 }
 
+type MessageType string
+
+const (
+	Chat MessageType = "Chat"
+	Game MessageType = "Game"
+)
+
+type MessageKind string
+
 type Message struct {
-	Name string `json:"name"`
-	Body string `json:"body"`
+	Name string      `json:"name"`
+	Type MessageType `json:"type"`
+	Kind MessageKind `json:"kind"`
+	Body string      `json:"body"`
+}
+
+func (m *Message) marshal() []byte {
+	s, _ := json.Marshal(m)
+	return s
+}
+func (r *room) handleMessage() {
+	switch {
+	case r.message.Type == Chat:
+		return
+	case r.message.Type == Game:
+		GameHandleAll(r)
+	}
+}
+
+func (r *room) createMessage(c *client) []byte {
+	switch {
+	case r.message.Type == Chat:
+		return []byte(r.message.marshal())
+	case r.message.Type == Game:
+		g := &GameMessage{
+			Name: "",
+			Type: Game,
+			Kind: r.message.Kind,
+			Body: r.message.Body,
+		}
+		r.tracer.Trace(r.message.Kind)
+
+		r.tracer.Trace(string(g.marshal()))
+		newG := g.handle(r, c)
+		return []byte(newG.marshal())
+	default:
+		return []byte(r.message.marshal())
+	}
 }
 
 func (r *room) Run() {
@@ -44,7 +92,7 @@ func (r *room) Run() {
 		case client := <-r.join:
 			// 参加
 			r.clients[client] = true
-			r.tracer.Trace("新しい1クライアントが参加しました")
+			r.tracer.Trace("新しいクライアントが参加しました")
 		case client := <-r.leave:
 			// 退室
 			delete(r.clients, client)
@@ -52,8 +100,15 @@ func (r *room) Run() {
 			r.tracer.Trace("クライアントが退室しました")
 		case msg := <-r.forward:
 			r.tracer.Trace("メッセージを受信しました: ", string(msg))
+			var message *Message
+			if err := json.Unmarshal(msg, &message); err != nil {
+				panic(err)
+			}
+			r.message = message
+			r.handleMessage()
 			// すべてのクライアントにメッセージを転送
 			for client := range r.clients {
+				msg = r.createMessage(client)
 				select {
 				case client.send <- msg:
 					// メッセージを送信
@@ -79,7 +134,7 @@ func (r *room) Handle(c echo.Context) error {
 	websocket.Handler(func(ws *websocket.Conn) {
 		defer ws.Close()
 		client := &client{
-			user:   &user{name: name},
+			user:   NewUser(name),
 			socket: ws,
 			send:   make(chan []byte, messageBufferSize),
 			room:   r,
@@ -87,9 +142,8 @@ func (r *room) Handle(c echo.Context) error {
 
 		r.join <- client
 
-		message := Message{Name: client.user.name, Body: "参加したよ！よろしくね！"}
-		s, _ := json.Marshal(message)
-		r.forward <- []byte(string(s))
+		message := &Message{Name: client.user.name, Body: "参加したよ！よろしくね！"}
+		r.forward <- []byte(string(message.marshal()))
 
 		defer func() { r.leave <- client }()
 		go client.write()
