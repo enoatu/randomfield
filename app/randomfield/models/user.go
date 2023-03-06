@@ -2,18 +2,19 @@ package models
 
 import (
 	"github.com/google/uuid"
-	"log"
 )
 
 type user struct {
-	name string
-	id   string
+	Name string `json:"name"`
+	Id   string `json:"id"`
+	GameData *GameData `json:"gameData"`
 }
 
 func NewUser(name string) *user {
-	log.Print(uuid.NewString())
+	var gameData *GameData
 	return &user{
-		name: name,
-		id:   uuid.NewString(),
+		Name: name,
+		Id:   uuid.NewString(),
+		GameData: gameData,
 	}
 }

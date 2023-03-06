@@ -17,9 +17,9 @@ export default function Room () {
   const router = useRouter()
   const { t, i18n } = useTranslation('room')
   i18n.addResourceBundle('ja', 'room', {
-    go: '確定',
-    name: '名前',
-    exit: '退室',
+    'go': '確定',
+    'name': '名前',
+    'exit': '退室',
     'start game!': 'ゲーム開始'
   })
 
@@ -51,8 +51,11 @@ export default function Room () {
   const startGame = () => {
     sendMessage({ name, type: game, kind: gameStart, body: 'はじめよう' })
   }
-  const sendGameMessage = () => {
-    sendMessage({ name, type: game, kind: gameUserAction, body: '' })
+  const sendGameMessage = (body: string) => {
+    sendMessage({ name, type: game, kind: gameUserAction, body })
+  }
+  const text = (text: string) => {
+    
   }
   return (
     <Layout title="Top">

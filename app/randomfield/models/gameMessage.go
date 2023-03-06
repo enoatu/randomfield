@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"math/rand"
 	"time"
+	"github.com/google/uuid"
+
 )
 
 type Card struct {
+	Id          string `json:"id"`
 	Name        string `json:"name"`
 	Power       int    `json:"power"`
 	Description string `json:"description"`
@@ -32,38 +35,45 @@ func (g *GameMessage) marshal() []byte {
 	return s
 }
 
+type GameData struct {
+	LifePoint  int     `json:"lifePoint"`
+	MagicPoint int     `json:"magicPoint"`
+	States     []State `json:"states"`
+	Cards      []Card  `json:"cards"`
+}
+
 type State struct {
 	Name string `json:"name"`
 }
 
-type UserStatus struct {
-	LifePoint  int     `json:"lifePoint"`
-	MagicPoint int     `json:"magicPoint"`
-	States     []State `json:"states"`
-}
-
-func NewUserStatus() UserStatus {
+func NewGameData() *GameData {
 	var states []State
-	return UserStatus{
+	return &GameData{
 		LifePoint:  100,
 		MagicPoint: 50,
 		States:     states,
+		Cards:      NewCards(),
 	}
-}
-
-// marshalしたとき、大文字じゃないと表示されない
-func NewUserStatusList(count int) []UserStatus {
-	var userStatusList []UserStatus
-	for i := 0; i < count; i++ {
-		userStatusList = append(userStatusList, NewUserStatus())
-	}
-	return userStatusList
 }
 
 type GameBody struct {
-	GameInfo       *GameInfo    `json:"gameInfo"`
-	Cards          []Card       `json:"cards"`
-	UserStatusList []UserStatus `json:"userStatusList"`
+	GameInfo     *GameInfo      `json:"gameInfo"`
+	MyData       user   `json:"myData"`
+	OthersData   map[string]user `json:"othersData"`
+}
+
+func NewGameBodyString (r *room, c *client) string {
+	othersData := make(map[string]user)
+	for c := range r.clients {
+		othersData[c.user.Id] = *c.user
+	}
+
+	gb := &GameBody{
+		GameInfo: r.gameInfo,
+		MyData: *c.user,
+		OthersData: othersData,
+	}
+	return string(gb.marshal())
 }
 
 func (g *GameBody) marshal() []byte {
@@ -74,6 +84,18 @@ func (g *GameBody) marshal() []byte {
 type GameInfo struct {
 	TurnCount  int    `json:"turnCount"`
 	TurnUserId string `json:"turnUserId"`
+}
+func NewGameInfo() *GameInfo {
+	return &GameInfo{
+		TurnCount: 1,
+	}
+}
+
+func InitGame(r *room) {
+	for c := range r.clients {
+		c.user.GameData = NewGameData()
+	}
+	r.gameInfo = NewGameInfo()
 }
 
 func GameHandleAll(r *room) {
@@ -89,37 +111,28 @@ func GameHandleAll(r *room) {
 
 func getUserTurn(r *room) string {
 	var clients []*client
-	for c, _ := range r.clients {
+	for c := range r.clients {
 		clients = append(clients, c)
 	}
-	return clients[r.gameInfo.TurnCount%len(clients)].user.id
+	return clients[r.gameInfo.TurnCount % len(clients)].user.Id
 }
 
 func (g *GameMessage) handle(r *room, c *client) *GameMessage {
 	switch {
 	case g.Kind == gameStart:
+		InitGame(r);
 		// カード配る
 		g.Kind = gameReadAction
-		gBody := &GameBody{
-			GameInfo:       r.gameInfo,
-			Cards:          g.startGame(),
-			UserStatusList: NewUserStatusList(len(r.clients)),
-		}
-		g.Body = string(gBody.marshal())
+		g.Body = NewGameBodyString(r, c)
 	case g.Kind == gameUserAction:
 		// カード配る
 		g.Kind = gameReadAction
-		gBody := &GameBody{
-			GameInfo:       r.gameInfo,
-			Cards:          g.startGame(),
-			UserStatusList: NewUserStatusList(len(r.clients)),
-		}
-		g.Body = string(gBody.marshal())
+		g.Body = NewGameBodyString(r, c)
 	}
 	return g
 }
 
-func (g *GameMessage) startGame() []Card {
+func NewCards() []Card {
 	initNumber := 3
 	rand.Seed(time.Now().UnixNano())
 
@@ -145,7 +158,10 @@ func (g *GameMessage) startGame() []Card {
 	}
 	var userCards []Card
 	for i := 0; i < initNumber; i++ {
-		userCards = append(userCards, cards[rand.Intn(2)])
+		userCard := cards[rand.Intn(2)]
+		// Id追加
+		userCard.Id = uuid.NewString()
+		userCards = append(userCards, userCard)
 	}
 	return userCards
 }

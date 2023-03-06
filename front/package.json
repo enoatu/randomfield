@@ -12,6 +12,7 @@
     "lint": "eslint --fix 'src/**/*{.js,.jsx,.ts,.tsx}'"
   },
   "dependencies": {
+    "@emotion/react": "^11.9.3",
     "i18next": "^21.8.8",
     "next": "latest",
     "react": "^17.0.1",

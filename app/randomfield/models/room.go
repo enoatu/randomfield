@@ -27,7 +27,7 @@ type room struct {
 func NewRoom() *room {
 	var buffer bytes.Buffer
 	return &room{
-		gameInfo: &GameInfo{TurnCount: 1},
+		gameInfo: NewGameInfo(),
 		forward:  make(chan []byte),
 		join:     make(chan *client),
 		leave:    make(chan *client),
@@ -142,7 +142,7 @@ func (r *room) Handle(c echo.Context) error {
 
 		r.join <- client
 
-		message := &Message{Name: client.user.name, Body: "参加したよ！よろしくね！"}
+		message := &Message{Name: client.user.Name, Body: "参加したよ！よろしくね！"}
 		r.forward <- []byte(string(message.marshal()))
 
 		defer func() { r.leave <- client }()
